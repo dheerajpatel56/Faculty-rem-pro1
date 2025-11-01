@@ -59,40 +59,11 @@ Reads faculty timetable data.
 
 ---
 
-### 3️⃣ Code Node — Convert Excel Time
-
-```js
-function excelToDate(excelSerial) {
-  if (!excelSerial) return "";
-  const excelEpoch = new Date(1899, 11, 30);
-  const days = Math.floor(excelSerial);
-  const msFromDays = days * 24 * 60 * 60 * 1000;
-  const fraction = excelSerial - days;
-  const msFromFraction = fraction * 24 * 60 * 60 * 1000;
-  const jsDate = new Date(excelEpoch.getTime() + msFromDays + msFromFraction);
-  return jsDate.toISOString();
-}
-
-for (const item of $input.all()) {
-  const row = item.json;
-  row.StartTime = excelToDate(parseFloat(row.StartTime));
-  row.EndTime = excelToDate(parseFloat(row.EndTime));
-}
-return $input.all();
-
 
 Converts Excel serial numbers like 45962.52083333 → 2025-11-01T12:30:00.000Z.
 
 4️⃣ Filter Node — Upcoming & Pending Classes
-const now = new Date();
-const fiveMinLater = new Date(now.getTime() + 5 * 60 * 1000);
 
-return $input.all().filter(item => {
-  const row = item.json;
-  if (!row.StartTime || row.Status?.toLowerCase() !== "pending") return false;
-  const start = new Date(row.StartTime);
-  return start >= now && start <= fiveMinLater;
-});
 
 
 Logic:
@@ -121,15 +92,7 @@ Output strictly in JSON array format:
 ]
 
 6️⃣ Code Node — Parse Gemini JSON Output
-const rawOutput = $json.output || "";
 
-try {
-  const cleaned = rawOutput.replace(/```json|```/g, "").trim();
-  const parsed = JSON.parse(cleaned);
-  return parsed.map(obj => ({ json: obj }));
-} catch (error) {
-  return [{ json: { error: "Failed to parse Gemini output", raw: rawOutput } }];
-}
 
 
 This converts Gemini’s string output to valid JSON objects for Gmail.
